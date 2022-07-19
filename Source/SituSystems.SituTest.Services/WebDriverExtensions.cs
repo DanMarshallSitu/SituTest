@@ -19,7 +19,6 @@ namespace SituSystems.SituTest.Services
             actions.MoveToElement(element).Perform();
             var byteArray = ((ITakesScreenshot) driver).GetScreenshot().AsByteArray;
             var image = Image.Load<Rgba32>(byteArray);
-
             return image;
         }
 
@@ -36,13 +35,11 @@ namespace SituSystems.SituTest.Services
             Thread.Sleep(TimeSpan.FromSeconds(1));
         }
 
-
         public static void ScrollTo(this ChromeDriver driver, IWebElement element)
         {
             var actions = new Actions(driver);
             actions.MoveToElement(element).Perform();
         }
-
 
         public static IWebElement GetElementWithWait(this IWebDriver driver, By selector)
         {

@@ -6,9 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
-using SituSystems.SituTest.Services;
 
-namespace SituSystems.SituTest
+namespace SituSystems.SituTest.Services
 {
     public class SituTestWorker : BackgroundService
     {

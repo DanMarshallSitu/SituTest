@@ -6,7 +6,5 @@
         public FeatureFlags FeatureFlags { get; set; }
     }
 
-    public class FeatureFlags
-    {
-    }
+    public class FeatureFlags { }
 }

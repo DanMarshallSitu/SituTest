@@ -1,57 +1,57 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
-    </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net5.0</TargetFramework>
+	</PropertyGroup>
 
-    <ItemGroup>
-      <None Remove="appsettings.json" />
-    </ItemGroup>
+	<ItemGroup>
+		<None Remove="appsettings.json" />
+	</ItemGroup>
 
-    <ItemGroup>
-      <Content Include="appsettings.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-    </ItemGroup>
+	<ItemGroup>
+		<Content Include="appsettings.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 
-    <ItemGroup>
+	<ItemGroup>
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
 		<PackageReference Include="AutoMapper" Version="11.0.1" />
-        <PackageReference Include="DotNetSeleniumExtras.WaitHelpers" Version="3.11.0" />
-        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.1" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="6.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
-        <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
-        <PackageReference Include="NamedServices.Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-        <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="103.0.5060.5300" />
-        <PackageReference Include="Selenium.WebDriver" Version="4.3.0" />
-        <PackageReference Include="SendGrid" Version="9.28.0" />
-        <PackageReference Include="Serilog.Extensions.Hosting" Version="5.0.1" />
-        <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
-        <PackageReference Include="Serilog.Settings.Configuration" Version="3.3.0" />
-        <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
-        <PackageReference Include="Serilog" Version="2.11.0" />
-        <PackageReference Include="SituAnalytics.WebApi.Client" Version="2.3.121" />
-        <PackageReference Include="SituSystems.Core.AzureServiceBus" Version="2.4.139" />
-        <PackageReference Include="SituSystems.Core.FileStorage" Version="2.4.139" />
-        <PackageReference Include="SituSystems.Core.Logging" Version="2.4.139" />
-        <PackageReference Include="SituSystems.Core.Security" Version="2.4.139" />
-        <PackageReference Include="SituSystems.IdentityServer.Contracts" Version="2.3.148" />
-        <PackageReference Include="SituSystems.IdentityServer.Library" Version="2.3.148" />
-        <PackageReference Include="SituSystems.IdentityServer.WebApi.Client" Version="2.3.148" />
-        <PackageReference Include="SituSystems.RenderService.Contracts" Version="0.1.251" />
-        <PackageReference Include="SituSystems.RenderService.WebApi.Client" Version="0.1.251" />
-        <PackageReference Include="SituSystems.Warp.Artifacts" Version="0.1.174" />
-        <PackageReference Include="SixLabors.ImageSharp" Version="2.1.3" />
-        <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
-    </ItemGroup>
+		<PackageReference Include="DotNetSeleniumExtras.WaitHelpers" Version="3.11.0" />
+		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
+		<PackageReference Include="NamedServices.Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+		<PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="103.0.5060.5300" />
+		<PackageReference Include="Selenium.WebDriver" Version="4.3.0" />
+		<PackageReference Include="SendGrid" Version="9.28.0" />
+		<PackageReference Include="Serilog.Extensions.Hosting" Version="5.0.1" />
+		<PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
+		<PackageReference Include="Serilog.Settings.Configuration" Version="3.3.0" />
+		<PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
+		<PackageReference Include="Serilog" Version="2.11.0" />
+		<PackageReference Include="SituAnalytics.WebApi.Client" Version="2.3.121" />
+		<PackageReference Include="SituSystems.Core.AzureServiceBus" Version="2.4.139" />
+		<PackageReference Include="SituSystems.Core.FileStorage" Version="2.4.139" />
+		<PackageReference Include="SituSystems.Core.Logging" Version="2.4.139" />
+		<PackageReference Include="SituSystems.Core.Security" Version="2.4.139" />
+		<PackageReference Include="SituSystems.IdentityServer.Contracts" Version="2.3.148" />
+		<PackageReference Include="SituSystems.IdentityServer.Library" Version="2.3.148" />
+		<PackageReference Include="SituSystems.IdentityServer.WebApi.Client" Version="2.3.148" />
+		<PackageReference Include="SituSystems.RenderService.Contracts" Version="0.1.251" />
+		<PackageReference Include="SituSystems.RenderService.WebApi.Client" Version="0.1.251" />
+		<PackageReference Include="SituSystems.Warp.Artifacts" Version="0.1.174" />
+		<PackageReference Include="SixLabors.ImageSharp" Version="2.1.3" />
+		<PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
+	</ItemGroup>
 
-    <ItemGroup>
-        <Folder Include="Contract\" />
-    </ItemGroup>
+	<ItemGroup>
+		<Folder Include="Contract\" />
+	</ItemGroup>
 
 </Project>

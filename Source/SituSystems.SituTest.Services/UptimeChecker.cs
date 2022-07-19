@@ -4,7 +4,6 @@ using System.Drawing;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
@@ -15,16 +14,13 @@ namespace SituSystems.SituTest.Services
 {
     public class UptimeChecker : IUptimeChecker
     {
-        private readonly IConfiguration _config;
         private readonly INotificationSender _notificationSender;
         private readonly List<IServiceChecker> _serviceCheckers;
         private readonly PanoramaCheckerSettings _settings;
 
-        public UptimeChecker(IConfiguration config,
-            INotificationSender notificationSender,
+        public UptimeChecker(INotificationSender notificationSender,
             IOptions<PanoramaCheckerSettings> appSettings)
         {
-            _config = config;
             _notificationSender = notificationSender;
             _settings = appSettings.Value;
 
@@ -49,6 +45,7 @@ namespace SituSystems.SituTest.Services
 
             // Cycle through all registered checkers
             foreach (var checker in _serviceCheckers)
+            {
                 try
                 {
                     if (!checker.RunContentCheck())
@@ -63,6 +60,7 @@ namespace SituSystems.SituTest.Services
                     checkSuccessful = false;
                     _notificationSender.SendError(checker);
                 }
+            }
 
             Console.WriteLine($"UptimeCheck successful: {checkSuccessful}");
 

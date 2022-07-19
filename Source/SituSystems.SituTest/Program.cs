@@ -17,19 +17,20 @@ using SituSystems.SituTest.Services;
 
 namespace SituSystems.SituTest
 {
-    class Program
+    internal class Program
     {
         private static readonly string AppName = "SituTest";
 
-        static async Task Main(string[] args)
+        private static async Task Main(string[] args)
         {
             await CreateHostBuilder(args).Build().RunAsync();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            return Host.CreateDefaultBuilder(args)
                 .ConfigureLogging(configureLogging => configureLogging
-                .AddFilter<EventLogLoggerProvider>(level => level >= LogLevel.Information))
+                    .AddFilter<EventLogLoggerProvider>(level => level >= LogLevel.Information))
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddCorrelationId();
@@ -37,7 +38,8 @@ namespace SituSystems.SituTest
                     services.AddMemoryCache();
                     AddServices(services, hostContext.Configuration);
                     hostContext.Configuration.Bind("PanoramaChecker", new PanoramaCheckerSettings());
-                    services.Configure<PanoramaCheckerSettings>(hostContext.Configuration.GetSection("PanoramaChecker"));
+                    services.Configure<PanoramaCheckerSettings>(
+                        hostContext.Configuration.GetSection("PanoramaChecker"));
 
                     services.AddHostedService<SituTestWorker>()
                         .Configure<EventLogSettings>(config =>
@@ -46,33 +48,37 @@ namespace SituSystems.SituTest
                             config.SourceName = "SituTest Service Source";
                         });
                 });
+        }
 
         private static void AddLogging(IServiceCollection services, HostBuilderContext builder)
         {
             var loggerConfiguration = new LoggerConfiguration();
-            
-            string GetValue(string key) => builder.Configuration.GetValue<string>(key);
+
+            string GetValue(string key)
+            {
+                return builder.Configuration.GetValue<string>(key);
+            }
 
             LoggingHelpers.ConfigureLogger(builder.Configuration,
-                loggerConfiguration,
-                GetValue("Environment"),
-                builder.HostingEnvironment.EnvironmentName,
-                AppName,
-                GetValue("AppVersion"),
-                Environment.MachineName,
-                GetValue("ElasticSearchUri"),
-                GetValue("ElasticSearchApiKeyId"),
-                GetValue("ElasticSearchApiKey"),
-                GetValue("SendGridApiKey"),
-                GetValue("SendGridFromEmail"),
-                GetValue("SendGridToEmail"),
-                GetValue("SeqUri"),
-                GetValue("SeqApiKey"))
-                    .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Warning)
-                    .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Query", LogEventLevel.Warning)
-                    .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Model.Validation", LogEventLevel.Warning)
-                    .MinimumLevel.Override("System.Net.Http.HttpClient", LogEventLevel.Warning)
-                    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning);
+                    loggerConfiguration,
+                    GetValue("Environment"),
+                    builder.HostingEnvironment.EnvironmentName,
+                    AppName,
+                    GetValue("AppVersion"),
+                    Environment.MachineName,
+                    GetValue("ElasticSearchUri"),
+                    GetValue("ElasticSearchApiKeyId"),
+                    GetValue("ElasticSearchApiKey"),
+                    GetValue("SendGridApiKey"),
+                    GetValue("SendGridFromEmail"),
+                    GetValue("SendGridToEmail"),
+                    GetValue("SeqUri"),
+                    GetValue("SeqApiKey"))
+                .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Query", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Model.Validation", LogEventLevel.Warning)
+                .MinimumLevel.Override("System.Net.Http.HttpClient", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning);
 
             var logger = loggerConfiguration.CreateLogger();
             Log.Logger = logger;
@@ -91,9 +97,14 @@ namespace SituSystems.SituTest
                 var identityServerBaseUrl = situSecuritySettings.IdentityServerBaseUrl;
                 var clientId = ClientIds.SituView;
                 var clientSecret = situSecuritySettings.Clients.SituView.ClientSecret;
-                var scope = $"{SituScopes.SituAnalyticsWebApi} {SituScopes.IdentityServerWebApi} {SituScopes.RenderService}";
+                var scope =
+                    $"{SituScopes.SituAnalyticsWebApi} {SituScopes.IdentityServerWebApi} {SituScopes.RenderService}";
 
-                return new TokenService(provider.GetService<IMemoryCache>(), identityServerBaseUrl, clientId, clientSecret, scope);
+                return new TokenService(provider.GetService<IMemoryCache>(),
+                    identityServerBaseUrl,
+                    clientId,
+                    clientSecret,
+                    scope);
             });
 
             services.AddHttpClient();

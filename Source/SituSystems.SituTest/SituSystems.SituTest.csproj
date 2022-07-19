@@ -46,7 +46,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\SituSystems.SituTest.Contracts\SituSystems.SituTest.Contracts.csproj" />
 		<ProjectReference Include="..\SituSystems.SituTest.Services\SituSystems.SituTest.Services.csproj" />
 	</ItemGroup>
 
