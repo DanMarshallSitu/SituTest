@@ -1,8 +1,7 @@
 ﻿namespace SituSystems.SituTest.Services
 {
-    public enum IfcType
+    public class UptimeCheckerSettings
     {
-        Master,
-        Option
+
     }
 }

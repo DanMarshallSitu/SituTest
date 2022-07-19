@@ -6,18 +6,19 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
-using SituSystems.SituTest.Services.Contract;
+using SituSystems.ArtifactStore.Services;
+using SituSystems.SituTest.Services;
 
 namespace SituSystems.SituTest
 {
-    public class ArtifactStoreWorker : BackgroundService
+    public class SituTestWorker : BackgroundService
     {
-        private readonly ILogger<ArtifactStoreWorker> _logger;
+        private readonly ILogger<SituTestWorker> _logger;
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private List<DateTime> _errors = new List<DateTime>();
 
-        public ArtifactStoreWorker(
-            ILogger<ArtifactStoreWorker> logger,
+        public SituTestWorker(
+            ILogger<SituTestWorker> logger,
             IServiceScopeFactory serviceScopeFactory)
         {
             _logger = logger;
@@ -31,9 +32,9 @@ namespace SituSystems.SituTest
                 try
                 {
                     using var scope = _serviceScopeFactory.CreateScope();
-                    var artifactStoreService = scope.ServiceProvider.GetService<IArtifactStoreService>();
+                    var uptimeChecker = scope.ServiceProvider.GetService<IUptimeChecker>();
 
-                    await artifactStoreService.CheckForNextRecipeToCook();
+                    await uptimeChecker!.Run();
                 }
                 catch (Exception ex)
                 {
