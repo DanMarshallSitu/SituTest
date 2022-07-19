@@ -1,0 +1,4 @@
+config:
+  SituSystems.SituTest.Pulumi:location: australiaeast
+  SituSystems.SituTest.Pulumi:locationFull: Australia East
+  SituSystems.SituTest.Pulumi:resourceName: test

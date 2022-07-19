@@ -1,0 +1,3 @@
+name: SituSystems.SituTest.Pulumi
+runtime: dotnet
+description: IaC for SituTests
