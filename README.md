@@ -1,6 +1,4 @@
-# SituHomeLauncher
-Situ Home Launcher
+# SituTest
+Situ Test
 
-Create the folder C:\SituHomeLauncher (this location can be overridden via the appsettings.json)
-
-Run the console App
+Runs automated tests via a Windows service

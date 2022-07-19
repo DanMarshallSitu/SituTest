@@ -1,5 +1,5 @@
-$pathToZipFile = "$(System.DefaultWorkingDirectory)/SituHomeLauncher/SituHomeLauncher/SituSystems.SituHomeLauncher.zip";
-$processName = "SituSystems.SituHomeLauncher";
+$pathToZipFile = "$(System.DefaultWorkingDirectory)/SituTest/SituTest/SituSystems.SituTest.zip";
+$processName = "SituSystems.SituTest";
 
 function UpdateAppSettings{
 	param( [string]$outputDir, [string]$instanceName, [string]$workFolder, [string]$processPreRender )
@@ -18,10 +18,10 @@ function DeployInstance{
 	$instanceName = ($instanceInfo -split ":")[0]
 	$workFolder = ($instanceInfo -split ":")[1]
 	$processPreRender = ($instanceInfo -split ":")[2]
-    $outputDir="c:\SituHomeLauncher\$instanceName";
+    $outputDir="c:\SituTest\$instanceName";
 	
 	# stop Bim Viewer
-	Write-Output "Stopping SituHomeLauncher if it is running"
+	Write-Output "Stopping SituTest if it is running"
 
 	#Stop-Process -Path $outputDir\$processName.exe -erroraction 'silentlycontinue'
 	Write-Output "Stopping $outputDir\$processName.exe"
@@ -41,17 +41,17 @@ function DeployInstance{
 	
 	UpdateAppSettings "$outputDir" "$instanceName" "$workFolder" "$processPreRender"
  
-	# start SituHomeLauncher
+	# start SituTest
 	Write-Output $($env:LogonPassword) $($env:LogonUser)
 	$PWord = ConvertTo-SecureString -String $($env:LogonPassword) -AsPlainText -Force
 	$Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $($env:LogonUser), $PWord
-	Write-Output "Starting SituHomeLauncher" 
+	Write-Output "Starting SituTest" 
 	Write-Output "$outputDir\$processName.exe"
 	Start-Process -FilePath "$outputDir\$processName.exe" -WorkingDirectory $outputDir -Credential $Credential
 
 	#Wait one last time
 	#Start-Sleep -Seconds 10
-	#Write-Output "SituHomeLauncher Started, all done!"
+	#Write-Output "SituTest Started, all done!"
 }
 
 $instances = $($env:Instances) -split ";"

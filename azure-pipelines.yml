@@ -10,7 +10,7 @@ pool:
   name: Web Agent Pool
 
 variables:
-  solution: '**/SituHomeLauncher.sln'
+  solution: '**/SituTest.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
   appVersion: ''
@@ -51,7 +51,7 @@ steps:
 - task: FileTransform@1
   displayName: 'File Transform: '
   inputs:
-    folderPath: '$(System.DefaultWorkingDirectory)/Source/SituSystems.SituHomeLauncher'
+    folderPath: '$(System.DefaultWorkingDirectory)/Source/SituSystems.SituTest'
     fileType: json
     targetFiles: '**/appsettings.json'
 
@@ -92,11 +92,11 @@ steps:
     summaryFileLocation: '$(Agent.TempDirectory)/**/coverage.cobertura.xml'
 
 - task: DotNetCoreCLI@2
-  displayName: dotnet publish SituHomeLauncher
+  displayName: dotnet publish SituTest
   inputs:
     command: publish
     publishWebProjects: false
-    projects: Source\SituSystems.SituHomeLauncher\SituSystems.SituHomeLauncher.csproj
+    projects: Source\SituSystems.SituTest\SituSystems.SituTest.csproj
     arguments: '--configuration $(BuildConfiguration) --output $(build.ArtifactStagingDirectory)'
     zipAfterPublish: True
 
@@ -104,4 +104,4 @@ steps:
   displayName: 'Publish Artifacts'
   inputs:
     PathtoPublish: '$(build.ArtifactStagingDirectory)'
-    ArtifactName: 'SituHomeLauncher'
+    ArtifactName: 'SituTest'
