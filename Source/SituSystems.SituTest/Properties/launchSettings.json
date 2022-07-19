@@ -1,7 +1,7 @@
 {
-    "profiles": {
-        "SituSystems.SituTest": {
-            "commandName": "Project"
-        }
+  "profiles": {
+    "SituSystems.SituTest": {
+      "commandName": "Project"
     }
+  }
 }

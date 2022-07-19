@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using SituSystems.Core.AzureServiceBus;
-
-namespace SituSystems.SituTest.Services
+﻿namespace SituSystems.SituTest.Services
 {
     public class PanoramaCheckerSettings
     {

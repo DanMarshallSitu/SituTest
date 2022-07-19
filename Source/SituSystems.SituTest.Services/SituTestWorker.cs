@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
-using SituSystems.ArtifactStore.Services;
 using SituSystems.SituTest.Services;
 
 namespace SituSystems.SituTest
@@ -15,7 +14,7 @@ namespace SituSystems.SituTest
     {
         private readonly ILogger<SituTestWorker> _logger;
         private readonly IServiceScopeFactory _serviceScopeFactory;
-        private List<DateTime> _errors = new List<DateTime>();
+        private readonly List<DateTime> _errors = new();
 
         public SituTestWorker(
             ILogger<SituTestWorker> logger,
@@ -28,7 +27,6 @@ namespace SituSystems.SituTest
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
-            {
                 try
                 {
                     using var scope = _serviceScopeFactory.CreateScope();
@@ -45,13 +43,12 @@ namespace SituSystems.SituTest
                     _errors.Add(DateTime.UtcNow);
 
                     // wait at least 1 minute before trying again
-                    var minsToWait = 1 + (_errors.Count / 2);
+                    var minsToWait = 1 + _errors.Count / 2;
                     await Task.Delay(new TimeSpan(0, minsToWait, 0), stoppingToken);
                 }
-            }
 
             var tcs = new TaskCompletionSource<bool>();
-            stoppingToken.Register(s => ((TaskCompletionSource<bool>)s).SetResult(true), tcs);
+            stoppingToken.Register(s => ((TaskCompletionSource<bool>) s).SetResult(true), tcs);
             await tcs.Task;
 
             _logger.LogInformation("Service stopped");

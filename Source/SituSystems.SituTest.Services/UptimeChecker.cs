@@ -9,16 +9,15 @@ using Microsoft.Extensions.Options;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using Serilog;
-using SituAnalytics.WebApi.Client.Contracts;
 using SituSystems.SituTest.Services.ServiceCheckers;
 
 namespace SituSystems.SituTest.Services
 {
     public class UptimeChecker : IUptimeChecker
     {
-        private readonly List<IServiceChecker> _serviceCheckers;
         private readonly IConfiguration _config;
         private readonly INotificationSender _notificationSender;
+        private readonly List<IServiceChecker> _serviceCheckers;
         private readonly PanoramaCheckerSettings _settings;
 
         public UptimeChecker(IConfiguration config,
@@ -29,18 +28,17 @@ namespace SituSystems.SituTest.Services
             _notificationSender = notificationSender;
             _settings = appSettings.Value;
 
-            var situDemoPanoChecker = new ServiceCheckers.PanoramaChecker("Situ Demo",
+            var situDemoPanoChecker = new PanoramaChecker("Situ Demo",
                 _settings.SituDemoUrl,
                 GetSituDemoPano,
-                _settings.PanoramaRetryDelayInSeconds
-                );
+                _settings.PanoramaRetryDelayInSeconds);
 
-            var burbankPanoChecker = new ServiceCheckers.PanoramaChecker("Burbank",
+            var burbankPanoChecker = new PanoramaChecker("Burbank",
                 _settings.BurbankPanoramaUrl,
                 GetBurbankPanoElement,
                 _settings.PanoramaRetryDelayInSeconds);
 
-            _serviceCheckers = new() { burbankPanoChecker, situDemoPanoChecker };
+            _serviceCheckers = new() {burbankPanoChecker, situDemoPanoChecker};
         }
 
         public async Task Run()

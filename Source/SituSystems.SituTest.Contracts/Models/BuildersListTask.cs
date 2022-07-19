@@ -1,6 +1,4 @@
 ﻿namespace SituSystems.SituTest.Contracts.Models
 {
-    public class BuildersListTask : SituTestTask
-    {
-    }
+    public class BuildersListTask : SituTestTask { }
 }

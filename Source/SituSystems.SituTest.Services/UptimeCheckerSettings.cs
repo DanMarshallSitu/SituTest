@@ -1,7 +1,4 @@
 ﻿namespace SituSystems.SituTest.Services
 {
-    public class UptimeCheckerSettings
-    {
-
-    }
+    public class UptimeCheckerSettings { }
 }
