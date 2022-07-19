@@ -81,14 +81,13 @@ namespace SituSystems.SituTest.Services.ServiceCheckers
             }
             finally
             {
-                driver.Close();
+                driver.Quit();
             }
         }
 
         public string GetErrorWarning()
         {
-            return $"Site checker for {ServiceName} could not find a non-black area "
-                   + $"in the bottom left hand side of the panorama. {_error}";
+            return $"Error checking {ServiceName} panorama. {_error}";
         }
 
         public string ServiceName { get; }
