@@ -8,16 +8,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Remove="appsettings.json" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Content Include="appsettings.json">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
 		<PackageReference Include="AutoMapper" Version="11.0.1" />
 		<PackageReference Include="Azure.Messaging.ServiceBus" Version="7.9.0" />
@@ -58,10 +48,6 @@
 	<ItemGroup>
 		<ProjectReference Include="..\SituSystems.SituTest.Contracts\SituSystems.SituTest.Contracts.csproj" />
 		<ProjectReference Include="..\SituSystems.SituTest.Services\SituSystems.SituTest.Services.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Folder Include="Contract\" />
 	</ItemGroup>
 
 </Project>

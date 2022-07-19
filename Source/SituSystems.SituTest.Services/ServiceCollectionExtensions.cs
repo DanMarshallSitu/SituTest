@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using SituSystems.SituTest.Services.AutoMapper;
+using SituSystems.ArtifactStore.Services.AutoMapper;
 
 namespace SituSystems.SituTest.Services
 {
@@ -11,6 +11,7 @@ namespace SituSystems.SituTest.Services
             services.AddMemoryCache();
             services.AddTransient<IUptimeChecker, UptimeChecker>();
             services.AddTransient<INotificationSender, NotificationSender>();
+
             return services;
         }
     }
