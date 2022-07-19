@@ -3,7 +3,7 @@ using SituSystems.Core.AzureServiceBus;
 
 namespace SituSystems.SituTest.Services
 {
-    public class AppSettings
+    public class PanoramaCheckerSettings
     {
         public AzureStorageCredentials AzureStorageCredentials { get; set; }
         public string BurbankPanoramaUrl { get; set; }
@@ -12,8 +12,8 @@ namespace SituSystems.SituTest.Services
         public int PanoramaRetryDelayInSeconds { get; set; }
         public string SituDemoUrl { get; set; }
         public string SituLoginUrl { get; set; }
-        public string SituPassword { get; set; }
-        public string SituUserName { get; set; }
+        public string SituPortalPass { get; set; }
+        public string SituPortalUser { get; set; }
     }
 
     public class AzureStorageCredentials { }

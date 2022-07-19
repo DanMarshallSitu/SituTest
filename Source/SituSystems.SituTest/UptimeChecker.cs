@@ -5,6 +5,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using Serilog;
@@ -18,22 +19,23 @@ namespace SituSystems.SituTest.Services
         private readonly List<IServiceChecker> _serviceCheckers;
         private readonly IConfiguration _config;
         private readonly INotificationSender _notificationSender;
-        private readonly AppSettings _settings;
-
+        private readonly PanoramaCheckerSettings _settings;
 
         public UptimeChecker(IConfiguration config,
-            INotificationSender notificationSender)
+            INotificationSender notificationSender,
+            IOptions<PanoramaCheckerSettings> appSettings)
         {
             _config = config;
             _notificationSender = notificationSender;
-            _settings = _config.GetValue<AppSettings>("AppSettings");
+            _settings = appSettings.Value;
 
-            var situDemoPanoChecker = new PanoramaChecker("Situ Demo",
+            var situDemoPanoChecker = new ServiceCheckers.PanoramaChecker("Situ Demo",
                 _settings.SituDemoUrl,
                 GetSituDemoPano,
                 _settings.PanoramaRetryDelayInSeconds
                 );
-            var burbankPanoChecker = new PanoramaChecker("Burbank",
+
+            var burbankPanoChecker = new ServiceCheckers.PanoramaChecker("Burbank",
                 _settings.BurbankPanoramaUrl,
                 GetBurbankPanoElement,
                 _settings.PanoramaRetryDelayInSeconds);
@@ -82,7 +84,7 @@ namespace SituSystems.SituTest.Services
 
         private IWebElement GetSituDemoPano(ChromeDriver driver)
         {
-            driver.SituLogin(_settings.SituLoginUrl, _settings.SituUserName, _settings.SituPassword);
+            driver.SituLogin(_settings.SituLoginUrl, _settings.SituPortalUser, _settings.SituPortalPass);
             driver.Manage().Window.Size = new Size(800, 1800);
             driver.Navigate().GoToUrl(_settings.SituDemoUrl);
             var panoElement = driver.GetElementWithWait(By.CssSelector("canvas"));

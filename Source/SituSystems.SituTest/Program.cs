@@ -36,9 +36,8 @@ namespace SituSystems.SituTest
                     AddLogging(services, hostContext);
                     services.AddMemoryCache();
                     AddServices(services, hostContext.Configuration);
-                    var appSettings = new AppSettings();
-                    hostContext.Configuration.Bind("AppSettings", appSettings);
-                    services.Configure<AppSettings>(hostContext.Configuration.GetSection("AppSettings"));
+                    hostContext.Configuration.Bind("PanoramaChecker", new PanoramaCheckerSettings());
+                    services.Configure<PanoramaCheckerSettings>(hostContext.Configuration.GetSection("PanoramaChecker"));
 
                     services.AddHostedService<SituTestWorker>()
                         .Configure<EventLogSettings>(config =>
@@ -48,24 +47,27 @@ namespace SituSystems.SituTest
                         });
                 });
 
-        private static void AddLogging(IServiceCollection services, HostBuilderContext hostBuilderContext)
+        private static void AddLogging(IServiceCollection services, HostBuilderContext builder)
         {
             var loggerConfiguration = new LoggerConfiguration();
-            LoggingHelpers.ConfigureLogger(hostBuilderContext.Configuration,
+            
+            string GetValue(string key) => builder.Configuration.GetValue<string>(key);
+
+            LoggingHelpers.ConfigureLogger(builder.Configuration,
                 loggerConfiguration,
-                hostBuilderContext.Configuration.GetValue<string>("Environment"),
-                hostBuilderContext.HostingEnvironment.EnvironmentName,
+                GetValue("Environment"),
+                builder.HostingEnvironment.EnvironmentName,
                 AppName,
-                hostBuilderContext.Configuration.GetValue<string>("AppVersion"),
+                GetValue("AppVersion"),
                 Environment.MachineName,
-                hostBuilderContext.Configuration.GetValue<string>("ElasticSearchUri"),
-                hostBuilderContext.Configuration.GetValue<string>("ElasticSearchApiKeyId"),
-                hostBuilderContext.Configuration.GetValue<string>("ElasticSearchApiKey"),
-                hostBuilderContext.Configuration.GetValue<string>("SendGridApiKey"),
-                hostBuilderContext.Configuration.GetValue<string>("SendGridFromEmail"),
-                hostBuilderContext.Configuration.GetValue<string>("SendGridToEmail"),
-                hostBuilderContext.Configuration.GetValue<string>("SeqUri"),
-                hostBuilderContext.Configuration.GetValue<string>("SeqApiKey"))
+                GetValue("ElasticSearchUri"),
+                GetValue("ElasticSearchApiKeyId"),
+                GetValue("ElasticSearchApiKey"),
+                GetValue("SendGridApiKey"),
+                GetValue("SendGridFromEmail"),
+                GetValue("SendGridToEmail"),
+                GetValue("SeqUri"),
+                GetValue("SeqApiKey"))
                     .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Warning)
                     .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Query", LogEventLevel.Warning)
                     .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Model.Validation", LogEventLevel.Warning)
