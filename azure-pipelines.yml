@@ -1,0 +1,107 @@
+# Add steps that run tests, create a NuGet package, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+  branches:
+    include:
+    - '*'
+
+pool:
+  name: Web Agent Pool
+
+variables:
+  solution: '**/SituHomeLauncher.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+  appVersion: ''
+  GitVersion.NuGetVersion: ""
+
+steps:
+- checkout: self
+  clean: true
+  persistCredentials: true
+  
+- task: gitversion/setup@0
+  displayName: gitversion
+  inputs:
+    versionSpec: '5.6.6'
+
+- task: gitversion/execute@0
+  displayName: gitversion/execute
+  inputs:
+    useConfigFile: true
+    configFilePath: GitVersion.yml
+
+- powershell: |
+   Write-Host "##vso[task.setvariable variable=AppVersion]$(GitVersion.NuGetVersion)"
+  displayName: 'Set AppVersion'
+
+- script: |
+   echo Tag commit with GitVersion.NuGetVersion if main branch
+   IF "$(Build.SourceBranchName)" == "main" (
+       echo Tagging commit on main branch with "$(GitVersion.NuGetVersion)"
+       git tag $(GitVersion.NugetVersion)
+       git push origin $(GitVersion.NugetVersion)
+       echo Tagged commit on main branch with "$(GitVersion.NuGetVersion)"
+   ) ELSE (
+       echo Skipped tagging commit as this is not main
+   )
+  displayName: 'Tag commit'
+
+- task: FileTransform@1
+  displayName: 'File Transform: '
+  inputs:
+    folderPath: '$(System.DefaultWorkingDirectory)/Source/SituSystems.SituHomeLauncher'
+    fileType: json
+    targetFiles: '**/appsettings.json'
+
+
+- task: UseDotNet@2
+  displayName: 'use dotnet 5'
+  inputs:
+    packageType: 'sdk'
+    version: '5.0.x'
+    includePreviewVersions: true
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet restore'
+  inputs:
+    command: restore
+    projects: '**/*.csproj'
+    vstsFeed: 'a80835b3-3859-415f-9540-2dcf010dc148'
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet build $(buildConfiguration)'
+  inputs:
+    command: 'build'
+    projects: '**/*.csproj'
+    arguments: '--configuration $(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet test'
+  inputs:
+    command: 'test'
+    arguments: '--configuration $(buildConfiguration) --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura'
+    publishTestResults: true
+    projects: '**/*.Tests**.csproj'
+  
+- task: PublishCodeCoverageResults@1
+  displayName: 'Publish code coverage report'
+  inputs:
+    codeCoverageTool: 'Cobertura'
+    summaryFileLocation: '$(Agent.TempDirectory)/**/coverage.cobertura.xml'
+
+- task: DotNetCoreCLI@2
+  displayName: dotnet publish SituHomeLauncher
+  inputs:
+    command: publish
+    publishWebProjects: false
+    projects: Source\SituSystems.SituHomeLauncher\SituSystems.SituHomeLauncher.csproj
+    arguments: '--configuration $(BuildConfiguration) --output $(build.ArtifactStagingDirectory)'
+    zipAfterPublish: True
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifacts'
+  inputs:
+    PathtoPublish: '$(build.ArtifactStagingDirectory)'
+    ArtifactName: 'SituHomeLauncher'

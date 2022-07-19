@@ -1,0 +1,62 @@
+$pathToZipFile = "$(System.DefaultWorkingDirectory)/SituHomeLauncher/SituHomeLauncher/SituSystems.SituHomeLauncher.zip";
+$processName = "SituSystems.SituHomeLauncher";
+
+function UpdateAppSettings{
+	param( [string]$outputDir, [string]$instanceName, [string]$workFolder, [string]$processPreRender )
+
+	$a = Get-Content "$outputDir\appsettings.json" -raw | ConvertFrom-Json
+	$a.AppSettings.InstanceName = "$instanceName"
+	$a.AppSettings.ProcessPreCache = ($processPreRender -eq "true")
+	$a.WarpSettings.LocalCacheRootPath = "c:\$workFolder\warp\localCache"
+	$a | ConvertTo-Json -depth 32| set-content "$outputDir/appsettings.json"
+	Start-Sleep -Seconds 10
+}
+
+function DeployInstance{
+    param( [string]$instanceInfo )
+	
+	$instanceName = ($instanceInfo -split ":")[0]
+	$workFolder = ($instanceInfo -split ":")[1]
+	$processPreRender = ($instanceInfo -split ":")[2]
+    $outputDir="c:\SituHomeLauncher\$instanceName";
+	
+	# stop Bim Viewer
+	Write-Output "Stopping SituHomeLauncher if it is running"
+
+	#Stop-Process -Path $outputDir\$processName.exe -erroraction 'silentlycontinue'
+	Write-Output "Stopping $outputDir\$processName.exe"
+	Get-Process | Where {$_.Path -Eq "$outputDir\$processName.exe" } | Select-Object -First 1 | Stop-Process -confirm:$false -Force | Wait-Process -erroraction 'silentlycontinue'
+
+	#Wait to be sure it was stopped
+	Start-Sleep -Seconds 10
+
+	# Unzip the artifact. Without the -Force parameter, the command will fail if 
+	# the destination path already exists. The -Force parameter is for overriding 
+	# the destination path if it already exists. 
+	Write-Output "Unzipping artifact at $pathToZipFile to $outputDir";
+	Expand-Archive -Force -Path $pathToZipFile -DestinationPath $outputDir
+
+	#Wait again for the unzip to finish
+	Start-Sleep -Seconds 10
+	
+	UpdateAppSettings "$outputDir" "$instanceName" "$workFolder" "$processPreRender"
+ 
+	# start SituHomeLauncher
+	Write-Output $($env:LogonPassword) $($env:LogonUser)
+	$PWord = ConvertTo-SecureString -String $($env:LogonPassword) -AsPlainText -Force
+	$Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $($env:LogonUser), $PWord
+	Write-Output "Starting SituHomeLauncher" 
+	Write-Output "$outputDir\$processName.exe"
+	Start-Process -FilePath "$outputDir\$processName.exe" -WorkingDirectory $outputDir -Credential $Credential
+
+	#Wait one last time
+	#Start-Sleep -Seconds 10
+	#Write-Output "SituHomeLauncher Started, all done!"
+}
+
+$instances = $($env:Instances) -split ";"
+
+Foreach ($instance in $instances)
+{
+	DeployInstance $instance
+}

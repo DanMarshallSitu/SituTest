@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31912.275
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SituSystems.SituHomeLauncher", "SituSystems.SituHomeLauncher\SituSystems.SituHomeLauncher.csproj", "{64DB4DC7-8190-4D75-BE37-9A8457BFC956}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{CF35B0BE-3834-4CA6-B997-D45C226E2D6A}"
+	ProjectSection(SolutionItems) = preProject
+		..\azure-pipelines.yml = ..\azure-pipelines.yml
+		..\deploy-service.ps = ..\deploy-service.ps
+		..\README.md = ..\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{634AC27D-E095-4C33-AE55-3F17B631855B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SituSystems.SituHomeLauncher.Services", "SituSystems.SituHomeLauncher.Services\SituSystems.SituHomeLauncher.Services.csproj", "{22FBB8D8-D4CA-4772-98C1-5EABE285341A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SituSystems.SituHomeLauncher.Tests.Unit", "SituSystems.SituHomeLauncher.Tests.Unit\SituSystems.SituHomeLauncher.Tests.Unit.csproj", "{91E2510B-E0D0-4F34-A70B-266AF010623A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SituSystems.SituHomeLauncher.Contracts", "SituSystems.SituHomeLauncher.Contracts\SituSystems.SituHomeLauncher.Contracts.csproj", "{D6B05798-B250-4FF6-AB34-E19A711C67F7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{64DB4DC7-8190-4D75-BE37-9A8457BFC956}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64DB4DC7-8190-4D75-BE37-9A8457BFC956}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64DB4DC7-8190-4D75-BE37-9A8457BFC956}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64DB4DC7-8190-4D75-BE37-9A8457BFC956}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22FBB8D8-D4CA-4772-98C1-5EABE285341A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22FBB8D8-D4CA-4772-98C1-5EABE285341A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22FBB8D8-D4CA-4772-98C1-5EABE285341A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22FBB8D8-D4CA-4772-98C1-5EABE285341A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91E2510B-E0D0-4F34-A70B-266AF010623A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91E2510B-E0D0-4F34-A70B-266AF010623A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91E2510B-E0D0-4F34-A70B-266AF010623A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91E2510B-E0D0-4F34-A70B-266AF010623A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6B05798-B250-4FF6-AB34-E19A711C67F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6B05798-B250-4FF6-AB34-E19A711C67F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6B05798-B250-4FF6-AB34-E19A711C67F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6B05798-B250-4FF6-AB34-E19A711C67F7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{91E2510B-E0D0-4F34-A70B-266AF010623A} = {634AC27D-E095-4C33-AE55-3F17B631855B}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5DDFCB98-9A61-470D-B916-D74D812B3C83}
+	EndGlobalSection
+EndGlobal
