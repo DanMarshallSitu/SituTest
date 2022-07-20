@@ -1,105 +1,69 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Policy;
 using System.Threading;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using Serilog;
+using SituSystems.SituTest.Services.Contract;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
 namespace SituSystems.SituTest.Services.ServiceCheckers
 {
-    public class PanoramaChecker : IServiceChecker
+    public class PanoramaChecker : ServiceCheckerBase
     {
         private readonly Func<ChromeDriver, IWebElement> _getPanoramaElement;
-        private readonly int _retryDelayInSeconds;
-        private readonly string _url;
-        private string _error;
 
-        public PanoramaChecker(string siteName,
-            string url,
-            Func<ChromeDriver, IWebElement> getPanoramaElement,
-            int retryDelayInSeconds)
+        public PanoramaChecker(string siteName, string uri, Func<ChromeDriver, IWebElement> getPanoramaElement, int maxRetryAttempts = 1)
         {
-            ServiceName = siteName;
-            _url = url;
+            Name = "Panorama checker for " + siteName;
+            Uri = new Uri(uri);
             _getPanoramaElement = getPanoramaElement;
-            _retryDelayInSeconds = retryDelayInSeconds;
+            MaxRetryAttempts = maxRetryAttempts;
         }
 
-        public bool RunContentCheck()
+        public override string Name { get; }
+        public override bool IsScreenShotRequired => true;
+        public override int MaxRetryAttempts { get; }
+        protected override bool RunCheckInternal()
         {
-            var driver = GetDriver();
-
-            driver.Manage().Timeouts().PageLoad = TimeSpan.FromMinutes(4);
-            var isAllBlack = true;
-
-            try
+            using (var driver = GetChromeDriver())
             {
-                var element = _getPanoramaElement(driver);
-
-                for (var retryAttempt = 1; retryAttempt <= 3; retryAttempt++)
+                try
                 {
+                    driver.Manage().Timeouts().PageLoad = TimeSpan.FromMinutes(4);
+                    var element = _getPanoramaElement(driver);
+                    CaptureFullScreenshot(driver);
                     using var image = driver.GetScreenshotStream(element);
+                    var isBlack = IsBottomRightQuadrantBlack(image, element);
+                    if (isBlack)
                     {
-                        CropPanoramaToBottomRightQuadrant(image, element);
-                        isAllBlack = CheckImageForAllBlackPixels(image);
+                        AddError("Black panorama encountered. Please investigate.");
 
-                        if (isAllBlack)
-                        {
-                            Log.Information("Black panorama encountered, retrying. Attempt " + retryAttempt, _url);
-                            Thread.Sleep(TimeSpan.FromSeconds(_retryDelayInSeconds));
-                        }
-
-                        else
-                        {
-                            break;
-                        }
+                        return false;
                     }
                 }
-
-                CaptureFullScreenshot(driver);
-                if (isAllBlack)
+                catch
                 {
-                    _error = $"Black panorama encountered. Please investigate. URL of failed panorama is {_url}";
-
-                    return false;
+                    CaptureFullScreenshot(driver);
+                    throw;
                 }
-                else
+                finally
                 {
-                    Log.Information($"Panorama check successful for {ServiceName}");
-                    return true;
+                    driver.Quit();
                 }
             }
-            catch (Exception ex)
-            {
-                CaptureFullScreenshot(driver);
-                Log.Error(ex, $"An error has occurred in {nameof(PanoramaChecker)}.");
-                _error = ex.Message;
-                return false;
-            }
-            finally
-            {
-                driver.Quit();
-            }
+
+            Log.Information($"Panorama check successful for {Name}");
+            return true;
         }
 
-        public string GetErrorWarning()
+        private bool IsBottomRightQuadrantBlack(Image<Rgba32> image, IWebElement element)
         {
-            return $"Error checking {ServiceName} panorama. {_error}";
-        }
-
-        public string ServiceName { get; }
-
-        public byte[] Screenshot { get; private set; }
-
-        public bool IsScreenShotRequired => true;
-
-        private string PersistScreenShotToBlobStorage(ChromeDriver driver)
-        {
-            var urlToBlob = "";
-            return urlToBlob;
+            CropPanoramaToBottomRightQuadrant(image, element);
+            return CheckImageForAllBlackPixels(image);
         }
 
         private bool CheckImageForAllBlackPixels(Image<Rgba32> image)
@@ -127,14 +91,6 @@ namespace SituSystems.SituTest.Services.ServiceCheckers
             return isAllBlack;
         }
 
-        private static ChromeDriver GetDriver()
-        {
-            var options = new ChromeOptions();
-            options.AddExcludedArguments(new List<string> {"excludeSwitches", "enable-logging"});
-            var driver = new ChromeDriver(options);
-            return driver;
-        }
-
         private static void CropPanoramaToBottomRightQuadrant(Image image, IWebElement element)
         {
             var x = element.Location.X;
@@ -156,20 +112,6 @@ namespace SituSystems.SituTest.Services.ServiceCheckers
             image.Mutate(c => { c.Crop(new(x2, y2, w2, h2)); });
 
             image.SaveAsPng($@"c:\temp\{time:hh mm ss} - Cropped.png");
-        }
-
-        private void CaptureFullScreenshot(ITakesScreenshot driver)
-        {
-            try
-            {
-                var screenshot = driver.GetScreenshot();
-                Screenshot = screenshot.AsByteArray;
-            }
-            catch (Exception e)
-            {
-                Log.Error(e, "Unable to capture full screen screenshot!");
-                throw;
-            }
         }
     }
 }

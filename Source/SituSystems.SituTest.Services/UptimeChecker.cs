@@ -14,77 +14,82 @@ namespace SituSystems.SituTest.Services
 {
     public class UptimeChecker : IUptimeChecker
     {
-        private readonly INotificationSender _notificationSender;
-        private readonly List<IServiceChecker> _serviceCheckers;
+        private readonly List<ServiceCheckerBase> _serviceCheckers;
         private readonly PanoramaCheckerSettings _settings;
 
-        public UptimeChecker(INotificationSender notificationSender,
-            IOptions<PanoramaCheckerSettings> appSettings)
+        public UptimeChecker(IOptions<AppSettings> appSettings)
         {
-            _notificationSender = notificationSender;
-            _settings = appSettings.Value;
+            _settings = appSettings.Value.PanoramaCheckers;
 
             var situDemoPanoChecker = new PanoramaChecker("Situ Demo",
-                _settings.SituDemoUrl,
-                GetSituDemoPano,
-                _settings.PanoramaRetryDelayInSeconds);
+                _settings.Situ.PanoramaUrl,
+                GetSituDemoPano, 
+                _settings.Situ.MaxRetryAttempts);
 
             var burbankPanoChecker = new PanoramaChecker("Burbank",
-                _settings.BurbankPanoramaUrl,
+                _settings.Burbank.PanoramaUrl,
                 GetBurbankPanoElement,
-                _settings.PanoramaRetryDelayInSeconds);
+                _settings.Burbank.MaxRetryAttempts);
 
             _serviceCheckers = new() {burbankPanoChecker, situDemoPanoChecker};
         }
 
         public async Task Run()
         {
-            var checkSuccessful = true;
-
-            if (!Directory.Exists(Path.GetTempPath() + "/1")) Directory.CreateDirectory(Path.GetTempPath() + "/1");
-
             // Cycle through all registered checkers
             foreach (var checker in _serviceCheckers)
             {
+                var checkSuccessful = false;
                 try
                 {
-                    if (!checker.RunContentCheck())
+                    var currentAttempt = 1;
+                    bool ExceededMaxAttempts() => currentAttempt > checker.MaxRetryAttempts;
+                    while (!ExceededMaxAttempts() && !checkSuccessful)
                     {
-                        checkSuccessful = false;
-                        _notificationSender.SendError(checker);
+                        var messageTemplate = $"Running {{CheckerName}}, attempt {currentAttempt} of {checker.MaxRetryAttempts}";
+                        Log.Information(messageTemplate, checker.Name);
+                        checkSuccessful = checker.RunCheckAndGetResult();
+                        if (!checkSuccessful)
+                        {
+                            Log.Information("{CheckerName} check failed", checker.Name);
+                        }
+
+                        currentAttempt++;
+                    }
+
+                    if (ExceededMaxAttempts())
+                    {
+                        checker.LogErrors();
                     }
                 }
                 catch (Exception ex)
                 {
-                    Log.Error(ex, "Exception encountered in running check");
-                    checkSuccessful = false;
-                    _notificationSender.SendError(checker);
+                    checker.AddError("Exception encountered while running check", ex);
+                    checker.LogErrors();
                 }
             }
-
-            Console.WriteLine($"UptimeCheck successful: {checkSuccessful}");
-
-            Thread.Sleep(TimeSpan.FromMinutes(_settings.CheckPeriodInMinutes));
         }
 
         private IWebElement GetBurbankPanoElement(ChromeDriver driver)
         {
-            driver.Navigate().GoToUrl(_settings.BurbankPanoramaUrl);
+            var burbank = _settings.Burbank;
+            driver.Navigate().GoToUrl(burbank.PanoramaUrl);
             driver.Manage().Window.Size = new Size(800, 1800);
             driver.FindElement(By.Id("myplace-tab")).Click();
             var panoElement = driver.GetElementWithWait(By.CssSelector("#pano-pano"));
-            Thread.Sleep(TimeSpan.FromSeconds(_settings.PanoramaLoadDelayInSeconds));
+            Thread.Sleep(TimeSpan.FromSeconds(burbank.PanoramaLoadDelayInSeconds));
             panoElement.Click();
             return panoElement;
         }
 
         private IWebElement GetSituDemoPano(ChromeDriver driver)
         {
-            driver.SituLogin(_settings.SituLoginUrl, _settings.SituPortalUser, _settings.SituPortalPass);
+            var situ = _settings.Situ;
+            driver.SituLogin(situ.LoginUrl, situ.UserName, situ.Password);
             driver.Manage().Window.Size = new Size(800, 1800);
-            driver.Navigate().GoToUrl(_settings.SituDemoUrl);
+            driver.Navigate().GoToUrl(situ.PanoramaUrl);
             var panoElement = driver.GetElementWithWait(By.CssSelector("canvas"));
-            Thread.Sleep(TimeSpan.FromSeconds(_settings.PanoramaLoadDelayInSeconds));
+            Thread.Sleep(TimeSpan.FromSeconds(situ.PanoramaLoadDelayInSeconds));
             driver.ScrollTo(panoElement);
             return panoElement;
         }

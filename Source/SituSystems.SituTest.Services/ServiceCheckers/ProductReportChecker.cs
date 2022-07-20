@@ -6,20 +6,21 @@ using SituAnalytics.WebApi.Client.Contracts;
 
 namespace SituSystems.SituTest.Services.ServiceCheckers
 {
-    public class ProductReportChecker : IServiceChecker
+    public class ProductReportChecker : ServiceCheckerBase
     {
-        private readonly ISituAnalyticsWebApiClient _client;
-        private string _error;
+        public override bool IsScreenShotRequired => false;
+        public override int MaxRetryAttempts => 1;
+        public byte[] Screenshot => throw new NotImplementedException();
+        public override string Name => "Product Impressions";
 
+        private readonly ISituAnalyticsWebApiClient _client;
         public ProductReportChecker(ISituAnalyticsWebApiClient client)
         {
             _client = client;
         }
 
-        public bool RunContentCheck()
+        protected override bool RunCheckInternal()
         {
-            _error = "";
-
             var clockOffTime = new TimeSpan(22, 0, 0);
             var startUpTime = new TimeSpan(8, 0, 0);
             var currentTime = DateTime.Now.TimeOfDay;
@@ -47,7 +48,7 @@ namespace SituSystems.SituTest.Services.ServiceCheckers
 
                 if (!report.IsCompletedSuccessfully)
                 {
-                    _error = "Could not check for the Product Impressions list. Could this be down?";
+                    AddError("Could not check for the Product Impressions list. Could this be down?");
                     return false;
                 }
 
@@ -57,15 +58,14 @@ namespace SituSystems.SituTest.Services.ServiceCheckers
                     if (report.Result.Items != null)
                         foreach (var item in report.Result.Items)
                             count += item.TotalImpressions;
-                    else _error = "The report for Product Impressions returned no data.";
+                    else AddError("The report for Product Impressions returned no data.");
                 }
 
                 // Checking over an interval of 3 hours, as prime time would usually present anything above 50, anything less than
                 // 10 may be a problem.
                 if (count <= 10)
                 {
-                    _error =
-                        $"There were less than 10 Product Impressions registered in the past three hours. ({report.Result.TotalItems})";
+                    AddError($"There were less than 10 Product Impressions registered in the past three hours. ({report.Result.TotalItems})");
                     return false;
                 }
 
@@ -73,21 +73,9 @@ namespace SituSystems.SituTest.Services.ServiceCheckers
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "An error has occured in ProductReportChecker.");
-                _error = ex.Message;
+                AddError("An error has occured in ProductReportChecker.", exception: ex);
                 return false;
             }
         }
-
-        public string GetErrorWarning()
-        {
-            return "Error found with hotspot informations: " + _error;
-        }
-
-        public bool IsScreenShotRequired => false;
-
-        public byte[] Screenshot => throw new NotImplementedException();
-
-        public string ServiceName => "Product Impressions";
     }
 }

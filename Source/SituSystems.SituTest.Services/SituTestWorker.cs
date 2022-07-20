@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Serilog;
 
 namespace SituSystems.SituTest.Services
@@ -13,14 +14,16 @@ namespace SituSystems.SituTest.Services
     {
         private readonly ILogger<SituTestWorker> _logger;
         private readonly IServiceScopeFactory _serviceScopeFactory;
-        private readonly List<DateTime> _errors = new();
+        private readonly AppSettings _settings;
 
         public SituTestWorker(
             ILogger<SituTestWorker> logger,
-            IServiceScopeFactory serviceScopeFactory)
+            IServiceScopeFactory serviceScopeFactory,
+            IOptions<AppSettings> settings)
         {
             _logger = logger;
             _serviceScopeFactory = serviceScopeFactory;
+            _settings = settings.Value;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -28,22 +31,23 @@ namespace SituSystems.SituTest.Services
             while (!stoppingToken.IsCancellationRequested)
                 try
                 {
+                    var start = DateTime.UtcNow;
+
                     using var scope = _serviceScopeFactory.CreateScope();
                     var uptimeChecker = scope.ServiceProvider.GetService<IUptimeChecker>();
-
+                    
                     await uptimeChecker!.Run();
+
+                    while (start.AddSeconds(_settings.CheckPeriodInSeconds) < DateTime.UtcNow)
+                    {
+                        Thread.Sleep(TimeSpan.FromSeconds(1));
+                    }
                 }
                 catch (Exception ex)
                 {
                     Log.Error(ex, "ArtifactStoreWorker Error");
 
-                    //clean out old errors first
-                    _errors.RemoveAll(x => x < DateTime.UtcNow.AddHours(-6));
-                    _errors.Add(DateTime.UtcNow);
-
-                    // wait at least 1 minute before trying again
-                    var minsToWait = 1 + _errors.Count / 2;
-                    await Task.Delay(new TimeSpan(0, minsToWait, 0), stoppingToken);
+                    await Task.Delay(TimeSpan.FromSeconds(_settings.UnhandledExceptionWaitInSeconds), stoppingToken);
                 }
 
             var tcs = new TaskCompletionSource<bool>();

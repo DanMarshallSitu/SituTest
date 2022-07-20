@@ -31,22 +31,23 @@ namespace SituSystems.SituTest
             return Host.CreateDefaultBuilder(args)
                 .ConfigureLogging(configureLogging => configureLogging
                     .AddFilter<EventLogLoggerProvider>(level => level >= LogLevel.Information))
-                .ConfigureServices((hostContext, services) =>
-                {
-                    services.AddCorrelationId();
-                    AddLogging(services, hostContext);
-                    services.AddMemoryCache();
-                    AddServices(services, hostContext.Configuration);
-                    hostContext.Configuration.Bind("PanoramaChecker", new PanoramaCheckerSettings());
-                    services.Configure<PanoramaCheckerSettings>(
-                        hostContext.Configuration.GetSection("PanoramaChecker"));
 
-                    services.AddHostedService<SituTestWorker>()
-                        .Configure<EventLogSettings>(config =>
-                        {
-                            config.LogName = "SituTest Service";
-                            config.SourceName = "SituTest Service Source";
-                        });
+                .ConfigureServices((hostContext, services) => ConfigureServices(services, hostContext));
+        }
+
+        private static void ConfigureServices(IServiceCollection services, HostBuilderContext hostContext)
+        {
+            services.AddCorrelationId();
+            AddLogging(services, hostContext);
+            services.AddMemoryCache();
+            AddServices(services, hostContext.Configuration);
+            hostContext.Configuration.Bind("AppSettings", new Services.AppSettings());
+            services.Configure<Services.AppSettings>(hostContext.Configuration.GetSection("AppSettings"));
+            services.AddHostedService<SituTestWorker>()
+                .Configure<EventLogSettings>(config =>
+                {
+                    config.LogName = "SituTest Service";
+                    config.SourceName = "SituTest Service Source";
                 });
         }
 
@@ -89,7 +90,6 @@ namespace SituSystems.SituTest
         private static void AddServices(IServiceCollection services, IConfiguration configuration)
         {
             var situSecuritySettings = configuration.GetSection("SituSecurity").Get<SituSecuritySettings>();
-            services.AddTransient<INotificationSender, NotificationSender>();
             services.AddTransient<IUptimeChecker, UptimeChecker>();
 
             services.AddTransient<ITokenService>(provider =>
