@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog;
+using SituSystems.SituTest.Services.ServiceCheckers;
 
 namespace SituSystems.SituTest.Services
 {
@@ -35,9 +36,7 @@ namespace SituSystems.SituTest.Services
 
                     using var scope = _serviceScopeFactory.CreateScope();
                     var uptimeChecker = scope.ServiceProvider.GetService<IUptimeChecker>();
-                    
-                    await uptimeChecker!.Run();
-
+                    await uptimeChecker!.Run(GetServiceCheckers(_settings));
                     while (start.AddSeconds(_settings.CheckPeriodInSeconds) < DateTime.UtcNow)
                     {
                         Thread.Sleep(TimeSpan.FromSeconds(1));
@@ -46,15 +45,26 @@ namespace SituSystems.SituTest.Services
                 catch (Exception ex)
                 {
                     Log.Error(ex, "ArtifactStoreWorker Error");
-
-                    await Task.Delay(TimeSpan.FromSeconds(_settings.UnhandledExceptionWaitInSeconds), stoppingToken);
+                    var delay = TimeSpan.FromSeconds(_settings.UnhandledExceptionWaitInSeconds);
+                    await Task.Delay(delay, stoppingToken);
                 }
 
             var tcs = new TaskCompletionSource<bool>();
-            stoppingToken.Register(s => ((TaskCompletionSource<bool>) s).SetResult(true), tcs);
+            stoppingToken.Register(s => ((TaskCompletionSource<bool>)s).SetResult(true), tcs);
             await tcs.Task;
 
             _logger.LogInformation("Service stopped");
+        }
+
+        private static List<ServiceChecker> GetServiceCheckers(AppSettings appSettings)
+        {
+            var serviceCheckerFactory = new PanoramaCheckerFactory(appSettings);
+
+            return new List<ServiceChecker> 
+            { 
+                serviceCheckerFactory.BurbankPanoramaChecker, 
+                serviceCheckerFactory.SituDemoPanoramaChecker
+            };
         }
     }
 }

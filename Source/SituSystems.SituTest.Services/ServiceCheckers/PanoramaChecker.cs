@@ -12,13 +12,13 @@ using SixLabors.ImageSharp.Processing;
 
 namespace SituSystems.SituTest.Services.ServiceCheckers
 {
-    public class PanoramaChecker : ServiceCheckerBase
+    public class PanoramaChecker : ServiceChecker
     {
         private readonly Func<ChromeDriver, IWebElement> _getPanoramaElement;
 
         public PanoramaChecker(string siteName, string uri, Func<ChromeDriver, IWebElement> getPanoramaElement, int maxRetryAttempts = 1)
         {
-            Name = "Panorama checker for " + siteName;
+            Name = $"{siteName} panorama checker";
             Uri = new Uri(uri);
             _getPanoramaElement = getPanoramaElement;
             MaxRetryAttempts = maxRetryAttempts;

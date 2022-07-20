@@ -6,7 +6,7 @@ using SituAnalytics.WebApi.Client.Contracts;
 
 namespace SituSystems.SituTest.Services.ServiceCheckers
 {
-    public class ProductReportChecker : ServiceCheckerBase
+    public class ProductReportChecker : ServiceChecker
     {
         public override bool IsScreenShotRequired => false;
         public override int MaxRetryAttempts => 1;

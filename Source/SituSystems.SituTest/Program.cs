@@ -41,8 +41,8 @@ namespace SituSystems.SituTest
             AddLogging(services, hostContext);
             services.AddMemoryCache();
             AddServices(services, hostContext.Configuration);
-            hostContext.Configuration.Bind("AppSettings", new Services.AppSettings());
-            services.Configure<Services.AppSettings>(hostContext.Configuration.GetSection("AppSettings"));
+            hostContext.Configuration.Bind("AppSettings", new AppSettings());
+            services.Configure<AppSettings>(hostContext.Configuration.GetSection("AppSettings"));
             services.AddHostedService<SituTestWorker>()
                 .Configure<EventLogSettings>(config =>
                 {

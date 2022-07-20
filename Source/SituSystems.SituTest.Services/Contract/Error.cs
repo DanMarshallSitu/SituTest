@@ -6,7 +6,7 @@ namespace SituSystems.SituTest.Services.Contract
 {
     public class Error
     {
-        public Error(string message, Exception exception, Uri uri, ServiceCheckerBase serviceChecker)
+        public Error(string message, Exception exception, Uri uri, ServiceChecker serviceChecker)
         {
             ServiceChecker = serviceChecker;
             Message = message;
@@ -15,7 +15,7 @@ namespace SituSystems.SituTest.Services.Contract
         }
 
         public string Message { get; }
-        public ServiceCheckerBase ServiceChecker { get; }
+        public ServiceChecker ServiceChecker { get; }
         public Exception Exception { get; }
         public Uri Uri { get; }
 

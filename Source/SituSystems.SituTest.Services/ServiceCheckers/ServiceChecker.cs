@@ -6,7 +6,7 @@ using SituSystems.SituTest.Services.Contract;
 
 namespace SituSystems.SituTest.Services.ServiceCheckers
 {
-    public abstract class ServiceCheckerBase
+    public abstract class ServiceChecker
     {
         public abstract string Name { get; }
         public abstract bool IsScreenShotRequired { get; }
